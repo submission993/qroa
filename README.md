@@ -1,4 +1,4 @@
-# 🛠️ New Title Incoming
+# 🛠️ Towards Universal and Black-Box Query-Response Only Attack on LLMs with QROA
 
 QROA, or Query-Response Optimization Attack, is an innovative and robust strategy designed to explore and exploit vulnerabilities in Large Language Models (LLMs) through black-box interactions. This method leverages optimized triggers embedded within benign-looking instructions to manipulate LLMs into generating harmful content. Developed without the need for direct model access or internal data insights, QROA operates solely via the standard input-output interface provided by LLMs. The attack's underlying techniques are inspired by advances in deep Q-learning, allowing dynamic token adjustments to maximize a reward function that aligns with the attacker's goals.
 
