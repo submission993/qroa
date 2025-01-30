@@ -9,6 +9,10 @@ The rapid adoption of Large Language Models (LLMs) has exposed critical security
 
 ![QROA](img/qroa.png)
 
+## 🌍 QROA Universal
+
+For our implementation of QROA Universal (QROA-UNV), which focuses on finding universal adversarial suffixes that work across multiple instructions, please check out the `qroa_universal` branch of this repository.
+
 ## ⚙️ Installation
 
 1. Clone the repository:
