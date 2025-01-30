@@ -188,46 +188,37 @@ class TriggerGenerator:
             self.D.pop(0)
 
     def _eval_triggers(self, list_instruction: List[str], triggers: List[str]) -> torch.Tensor:
-
-        # instructions = random.choices(list_instruction, k=len(triggers))
-        # prompts = [i + t for i, t in zip(instructions, triggers)]
-        # generations = self.model.generate(
-        #     prompts,
-        #     max_tokens=self.max_generations_tokens
-        # )
-        # score_array = self.scoring_function.score(
-        #     instructions,
-        #     generations,
-        #     prompts
-        # )
-
-        # instructions = []
-        # prompts = []
-        # for instruction in list_instruction:
-        #     instructions += [instruction] * len(triggers)
-        #     prompts += [instruction + t for t in triggers]
-
-        # generations = self.model.generate(prompts, max_tokens=self.max_generations_tokens)
-        # scores = self.scoring_function.score(instructions, generations, prompts)
-        # scores = [scores[i*len(triggers):(i+1)*len(triggers)] for i in range(len(list_instruction))]
+        # Input validation
+        if not list_instruction or not triggers:
+            raise ValueError("Both list_instruction and triggers must be non-empty")
 
         scores = []
 
         for instruction in list_instruction:
             # Create a list of full prompts by appending each trigger to the instruction
             instructions = [instruction] * len(triggers)
-            prompts = [instructions[i] + t for i, t in enumerate(triggers)]
+            prompts = [instruction + t for t in triggers]  # Fixed: removed unnecessary indexing
 
-            # Use the language model to generate responses for each prompt
-            generations = self.model.generate(prompts, max_tokens=self.max_generations_tokens)
+            try:
+                # Use the language model to generate responses for each prompt
+                generations = self.model.generate(prompts, max_tokens=self.max_generations_tokens)
 
-            # Apply the scoring function to evaluate how well the responses meet the criteria defined by the scoring function
-            score_instruction = self.scoring_function.score(instructions, generations, prompts)
+                # Apply the scoring function to evaluate how well the responses meet the criteria
+                score_instruction = self.scoring_function.score(instructions, generations, prompts)
+                
+                if score_instruction is not None:  # Add validation
+                    scores.append(score_instruction)
+                else:
+                    print(f"Warning: Scoring returned None for instruction: {instruction}")
 
-            scores.append(score_instruction)
+            except Exception as e:
+                print(f"Error processing instruction '{instruction}': {str(e)}")
+                continue
+
+        if not scores:
+            raise RuntimeError("No valid scores were generated. Check the model and scoring function.")
 
         score_array = torch.stack(scores).mean(dim=0)
-
         return score_array
 
     def _add_logging(self,
@@ -490,28 +481,6 @@ class TriggerValidator:
         self.logging = pd.DataFrame()  # Logging dataframe.
 
     def _eval_triggers(self, list_instruction: List[str], triggers: List[str]) -> torch.Tensor:
-
-        # instructions = random.choices(list_instruction, k=len(triggers))
-        # prompts = [i + t for i, t in zip(instructions, triggers)]
-        # generations = self.model.generate(
-        #     prompts,
-        #     max_tokens=self.max_generations_tokens
-        # )
-        # score_array = self.scoring_function.score(
-        #     instructions,
-        #     generations,
-        #     prompts
-        # )
-
-        # instructions = []
-        # prompts = []
-        # for instruction in list_instruction:
-        #     instructions += [instruction] * len(triggers)
-        #     prompts += [instruction + t for t in triggers]
-
-        # generations = self.model.generate(prompts, max_tokens=self.max_generations_tokens)
-        # scores = self.scoring_function.score(instructions, generations, prompts)
-        # scores = [scores[i*len(triggers):(i+1)*len(triggers)] for i in range(len(list_instruction))]
 
         scores = []
 
